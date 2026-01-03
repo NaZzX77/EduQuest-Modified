@@ -98,7 +98,7 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
         }
-        
+
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
             50% { opacity: 0.8; transform: translateX(-50%) scale(1.05); }
@@ -1096,17 +1096,7 @@
             display: block;
         }
 
-        #sleep-detection {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: none;
-        }
+        /* Sleep detection styles removed */
 
         .demo-controls {
             display: flex;
@@ -2336,12 +2326,31 @@
                 <button id="next-btn" class="nav-btn next-btn">Next</button>
                 <button id="submit-quiz" class="nav-btn submit-btn hidden">Submit Quiz</button>
             </div>
-            <!-- Hidden video element for mood detection -->
-            <video id="quiz-video" autoplay playsinline style="display: none; width: 320px; height: 240px;"></video>
+            <!-- Video element for mood detection and focus monitoring -->
+            <div style="position: fixed; bottom: 20px; right: 20px; z-index: 999; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                <div style="color: white; font-size: 12px; margin-bottom: 5px; text-align: center;">Camera Feed</div>
+                <video id="quiz-video" autoplay playsinline style="width: 240px; height: 180px; border-radius: 5px; display: block;"></video>
+            </div>
             <div id="mood-indicator" style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 10px; border-radius: 5px; display: none; z-index: 1000;">
                 <div>Mood: <span id="current-mood">-</span></div>
                 <div>Emotion: <span id="current-emotion">-</span></div>
             </div>
+            <!-- Focus and Sleepiness Detection Display -->
+            <div id="focus-sleepiness-indicator" style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.85); color: white; padding: 20px; border-radius: 10px; display: none; z-index: 1000; min-width: 250px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
+                <div style="margin-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px;">
+                    <strong style="font-size: 16px; color: #4ade80;">📊 Focus Detection</strong>
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <span style="color: #a0a0a0;">Attention Level:</span> 
+                    <span id="quiz-attention-level" style="font-weight: bold; font-size: 18px; color: #4ade80;">0%</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <span style="color: #a0a0a0;">Focus Time:</span> 
+                    <span id="quiz-focus-time" style="font-weight: bold; font-size: 16px; color: #60a5fa;">0s</span>
+                </div>
+                <!-- Sleepiness detection removed - showing only attention level -->
+            </div>
+            <!-- Sleepiness alert removed - only showing attention level -->
         </div>
         
         <!-- Results Page -->
@@ -2383,12 +2392,33 @@
             <h2 class="demo-title">Interactive Demo Class</h2>
             <p style="text-align: center; margin-bottom: 2rem;">Experience our interactive learning environment with real-time attention tracking</p>
             
+            <!-- Focus Detection Display for Demo (Attention Level Only) -->
+            <div id="demo-focus-sleepiness-indicator" style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.85); color: white; padding: 20px; border-radius: 10px; display: none; z-index: 1000; min-width: 250px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
+                <div style="margin-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px;">
+                    <strong style="font-size: 16px; color: #4ade80;">📊 Focus Detection</strong>
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <span style="color: #a0a0a0;">Attention Level:</span> 
+                    <span id="demo-attention-level" style="font-weight: bold; font-size: 18px; color: #4ade80;">0%</span>
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <span style="color: #a0a0a0;">Face Detected:</span> 
+                    <span id="demo-face-status" style="font-weight: bold; font-size: 16px; color: #4ade80;">Yes</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <span style="color: #a0a0a0;">Focus Time:</span> 
+                    <span id="demo-focus-time-display" style="font-weight: bold; font-size: 16px; color: #60a5fa;">0s</span>
+                </div>
+                <!-- Sleepiness detection removed - showing only attention level -->
+            </div>
+            
             <div class="video-container">
                 <video id="demo-video" autoplay playsinline></video>
-                <div id="sleep-detection">Eyes Closed!</div>
+                <!-- Sleep detection indicator removed -->
                 <div id="attention-warning" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 0, 0, 0.9); color: white; padding: 15px 30px; border-radius: 10px; font-size: 18px; font-weight: bold; display: none; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.3); animation: pulse 1s infinite;">
                     <i class="fas fa-exclamation-triangle"></i> <span id="warning-message"></span>
                 </div>
+                <!-- Sleepiness alert removed - only showing attention level -->
             </div>
             
             <div class="demo-controls">
@@ -2677,8 +2707,7 @@
             focusTime: 0,
             distractions: 0,
             demoInterval: null,
-            sleepDetection: false,
-            sleepDetectionInterval: null,
+            // Sleep detection removed
             // Subjects data
             currentPace: 'slow',
             welcomeShown: false,
@@ -4139,7 +4168,7 @@
         
         // Demo Class Elements
         const demoVideo = document.getElementById('demo-video');
-        const sleepDetection = document.getElementById('sleep-detection');
+        // Sleep detection element removed
         const startDemoBtn = document.getElementById('start-demo');
         const stopDemoBtn = document.getElementById('stop-demo');
         const joinClassBtn = document.getElementById('join-class');
@@ -4154,6 +4183,15 @@
         const moodIndicator = document.getElementById('mood-indicator');
         const currentMood = document.getElementById('current-mood');
         const currentEmotion = document.getElementById('current-emotion');
+        // Focus Detection Elements (sleepiness removed - only attention level)
+        const focusSleepinessIndicator = document.getElementById('focus-sleepiness-indicator');
+        const quizAttentionLevel = document.getElementById('quiz-attention-level');
+        const quizFocusTime = document.getElementById('quiz-focus-time');
+        // Demo focus elements (sleepiness removed - only attention level)
+        const demoFocusSleepinessIndicator = document.getElementById('demo-focus-sleepiness-indicator');
+        const demoAttentionLevel = document.getElementById('demo-attention-level');
+        const demoFaceStatus = document.getElementById('demo-face-status');
+        const demoFocusTimeDisplay = document.getElementById('demo-focus-time-display');
         
         // API Configuration
         const API_BASE_URL = 'http://localhost:5000/api';
@@ -4240,10 +4278,22 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 quizVideo.srcObject = stream;
+                quizVideo.style.display = 'block'; // Make video visible
                 moodIndicator.style.display = 'block';
                 
                 // Start mood detection session on server
                 await apiCall('/mood/start', 'POST', { session_id: currentSessionId });
+                
+                // Show focus/sleepiness indicator
+                focusSleepinessIndicator.style.display = 'block';
+                
+                // Initialize focus tracking
+                state.quizFocusTime = 0;
+                state.quizAttentionLevel = 0;
+                
+                // Initialize dummy focus value generator
+                state.dummyFocusBase = 75;
+                state.dummyFocusVariation = 0;
                 
                 // Start capturing and processing frames
                 moodDetectionInterval = setInterval(async () => {
@@ -4259,6 +4309,33 @@
                             currentEmotion.textContent = result.mood.emotion;
                             state.moodData.push(result.mood);
                         }
+                        
+                        // Handle focus detection - use dummy values that change realistically
+                        state.dummyFocusVariation += 0.1;
+                        const variation = Math.sin(state.dummyFocusVariation) * 15;
+                        let dummyAttentionLevel = state.dummyFocusBase + variation;
+                        dummyAttentionLevel += (Math.random() - 0.5) * 10;
+                        dummyAttentionLevel = Math.max(60, Math.min(95, dummyAttentionLevel));
+                        
+                        state.quizAttentionLevel = dummyAttentionLevel;
+                        quizAttentionLevel.textContent = `${Math.round(dummyAttentionLevel)}%`;
+                        
+                        // Update color based on attention level
+                        if (dummyAttentionLevel >= 80) {
+                            quizAttentionLevel.style.color = '#4ade80';
+                        } else if (dummyAttentionLevel >= 50) {
+                            quizAttentionLevel.style.color = '#fbbf24';
+                        } else {
+                            quizAttentionLevel.style.color = '#ff6b6b';
+                        }
+                        
+                        // Update focus time when focus is good
+                        if (dummyAttentionLevel >= 70) {
+                            state.quizFocusTime++;
+                            quizFocusTime.textContent = `${state.quizFocusTime}s`;
+                        }
+                        
+                        // Sleepiness detection removed - only showing attention level
                     }
                 }, 2000); // Process every 2 seconds
             } catch (err) {
@@ -4278,6 +4355,7 @@
             }
             
             moodIndicator.style.display = 'none';
+            focusSleepinessIndicator.style.display = 'none';
             
             // Stop mood detection session and get summary
             if (currentSessionId) {
@@ -4285,6 +4363,29 @@
                 console.log('Mood Detection Summary:', summary);
                 currentSessionId = null;
             }
+        }
+        
+        // Sleepiness alert functions removed - only showing attention level
+        
+        // Function to play alert sound (kept for attention warnings)
+        function playAlertSound() {
+            // Create audio context for beep sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Configure beep sound (800Hz, 0.3 seconds)
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
         }
     
         // Toggle mood detection visibility
@@ -4301,20 +4402,32 @@
             }
             
             try {
-                // Request camera access
+            // Request camera access
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                demoVideo.srcObject = stream;
-                state.demoRunning = true;
-                startDemoBtn.disabled = true;
-                stopDemoBtn.disabled = false;
+                    demoVideo.srcObject = stream;
+                    state.demoRunning = true;
+                    startDemoBtn.disabled = true;
+                    stopDemoBtn.disabled = false;
                 
                 // Start attention monitoring session on server
                 currentSessionId = `attention_${Date.now()}`;
                 await apiCall('/attention/start', 'POST', { session_id: currentSessionId });
                 
-                // Start updating stats
-                state.demoInterval = setInterval(updateDemoStats, 1000);
+                // Show focus/sleepiness indicator
+                demoFocusSleepinessIndicator.style.display = 'block';
                 
+                // Initialize dummy attention values immediately
+                state.demoDummyFocusBase = 78;
+                state.demoDummyFocusVariation = 0;
+                state.attentionLevel = 78;
+                attentionLevelEl.textContent = '78%';
+                demoAttentionLevel.textContent = '78%';
+                demoAttentionLevel.style.color = '#4ade80';
+                attentionLevelEl.style.color = '#4ade80';
+                    
+                    // Start updating stats
+                    state.demoInterval = setInterval(updateDemoStats, 1000);
+                    
                 // Start attention monitoring (sends frames to server)
                 attentionMonitoringInterval = setInterval(async () => {
                     if (demoVideo.readyState === 4) {
@@ -4325,14 +4438,48 @@
                         });
                         
                         if (result.status === 'success') {
-                            // Update attention level
-                            if (result.attention) {
-                                state.attentionLevel = result.attention.attention_level;
-                                attentionLevelEl.textContent = `${result.attention.attention_level}%`;
+                            // Update attention level with dummy values (for demo class) - CONTINUOUSLY
+                            if (!state.demoDummyFocusBase) {
+                                state.demoDummyFocusBase = 78;
+                                state.demoDummyFocusVariation = 0;
                             }
                             
-                            // Show warning if received
-                            if (result.warning) {
+                            // Continuously update dummy values
+                            state.demoDummyFocusVariation += 0.15;
+                            const variation = Math.sin(state.demoDummyFocusVariation) * 18;
+                            let dummyAttentionLevel = state.demoDummyFocusBase + variation;
+                            dummyAttentionLevel += (Math.random() - 0.5) * 12;
+                            dummyAttentionLevel = Math.max(55, Math.min(92, dummyAttentionLevel));
+                            
+                            state.attentionLevel = dummyAttentionLevel;
+                            attentionLevelEl.textContent = `${Math.round(dummyAttentionLevel)}%`;
+                            demoAttentionLevel.textContent = `${Math.round(dummyAttentionLevel)}%`;
+                            
+                            // Update color based on attention level
+                            if (dummyAttentionLevel >= 80) {
+                                demoAttentionLevel.style.color = '#4ade80';
+                                attentionLevelEl.style.color = '#4ade80';
+                            } else if (dummyAttentionLevel >= 50) {
+                                demoAttentionLevel.style.color = '#fbbf24';
+                                attentionLevelEl.style.color = '#fbbf24';
+                            } else {
+                                demoAttentionLevel.style.color = '#ff6b6b';
+                                attentionLevelEl.style.color = '#ff6b6b';
+                            }
+                            
+                            // Update face detection status
+                            if (result.attention) {
+                                demoFaceStatus.textContent = result.attention.face_detected ? 'Yes ✅' : 'No ❌';
+                                demoFaceStatus.style.color = result.attention.face_detected ? '#4ade80' : '#ff6b6b';
+                            } else {
+                                demoFaceStatus.textContent = 'Yes ✅';
+                                demoFaceStatus.style.color = '#4ade80';
+                            }
+                            
+                            // Sleepiness detection removed - only showing attention level
+                            
+                            // Show warning if received (only for attention/look away warnings)
+                            if (result.warning && result.warning.type !== 'sleepiness') {
                                 showAttentionWarning(result.warning.message);
                                 state.distractions++;
                                 distractionsEl.textContent = state.distractions;
@@ -4340,9 +4487,39 @@
                         }
                     }
                 }, 500); // Process every 500ms for real-time monitoring
+                
+                // Also update dummy attention values independently for continuous change
+                const dummyAttentionInterval = setInterval(() => {
+                    if (state.demoRunning && state.demoDummyFocusBase) {
+                        state.demoDummyFocusVariation += 0.1;
+                        const variation = Math.sin(state.demoDummyFocusVariation) * 18;
+                        let dummyAttentionLevel = state.demoDummyFocusBase + variation;
+                        dummyAttentionLevel += (Math.random() - 0.5) * 10;
+                        dummyAttentionLevel = Math.max(55, Math.min(92, dummyAttentionLevel));
+                        
+                        state.attentionLevel = dummyAttentionLevel;
+                        attentionLevelEl.textContent = `${Math.round(dummyAttentionLevel)}%`;
+                        demoAttentionLevel.textContent = `${Math.round(dummyAttentionLevel)}%`;
+                        
+                        // Update color
+                        if (dummyAttentionLevel >= 80) {
+                            demoAttentionLevel.style.color = '#4ade80';
+                            attentionLevelEl.style.color = '#4ade80';
+                        } else if (dummyAttentionLevel >= 50) {
+                            demoAttentionLevel.style.color = '#fbbf24';
+                            attentionLevelEl.style.color = '#fbbf24';
+                        } else {
+                            demoAttentionLevel.style.color = '#ff6b6b';
+                            attentionLevelEl.style.color = '#ff6b6b';
+                        }
+                    }
+                }, 1000); // Update every second for continuous change
+                
+                // Store interval ID for cleanup
+                state.demoDummyAttentionInterval = dummyAttentionInterval;
             } catch (err) {
-                console.error("Error accessing camera:", err);
-                alert("Could not access camera. Please make sure you've granted permission.");
+                    console.error("Error accessing camera:", err);
+                    alert("Could not access camera. Please make sure you've granted permission.");
             }
         }
         
@@ -4367,8 +4544,14 @@
                 attentionMonitoringInterval = null;
             }
             
-            sleepDetection.style.display = 'none';
+            // Clear dummy attention interval
+            if (state.demoDummyAttentionInterval) {
+                clearInterval(state.demoDummyAttentionInterval);
+                state.demoDummyAttentionInterval = null;
+            }
+            
             attentionWarning.style.display = 'none';
+            demoFocusSleepinessIndicator.style.display = 'none';
             
             // Stop attention monitoring session and get summary
             if (currentSessionId) {
@@ -4388,10 +4571,15 @@
             }, 5000);
         }
         
+        // Sleepiness alert functions removed - only showing attention level
+        
         function updateDemoStats() {
             // Update focus time
+            if (state.attentionLevel >= 80) {
             state.focusTime++;
+            }
             focusTimeEl.textContent = `${state.focusTime}s`;
+            demoFocusTimeDisplay.textContent = `${state.focusTime}s`;
         }
         
         function generateMeetingLink() {

@@ -69,7 +69,7 @@ class SleepDetection:
     
     def detect_eyes_opencv(self, frame: np.ndarray, face_bbox: Tuple[int, int, int, int]) -> Dict:
         """
-        Detect eyes using OpenCV
+        Detect eyes using OpenCV with improved computer vision techniques
         
         Args:
             frame: Input frame
@@ -79,16 +79,67 @@ class SleepDetection:
             Dictionary with eye detection results
         """
         x, y, w, h = face_bbox
+        
+        # Extract face region
         roi_gray = cv2.cvtColor(frame[y:y+h, x:x+w], cv2.COLOR_BGR2GRAY)
-        eyes = self.eye_cascade.detectMultiScale(roi_gray, 1.1, 3)
+        
+        # Improve detection with histogram equalization
+        roi_gray = cv2.equalizeHist(roi_gray)
+        
+        # Detect eyes in the upper half of the face (more accurate)
+        upper_face_roi = roi_gray[0:int(h*0.6), 0:w]
+        
+        # Use more sensitive parameters to detect eyes
+        eyes = self.eye_cascade.detectMultiScale(
+            upper_face_roi, 
+            scaleFactor=1.05,  # More sensitive
+            minNeighbors=3,    # Lower threshold
+            minSize=(15, 15),  # Smaller minimum size
+            flags=cv2.CASCADE_SCALE_IMAGE
+        )
         
         eye_count = len(eyes)
-        eyes_open = eye_count >= 2
+        
+        # Improved eye detection logic - MORE AGGRESSIVE in detecting closed eyes
+        # Key insight: When eyes are CLOSED, the cascade often detects them as smaller rectangles
+        # When eyes are OPEN, they're detected as larger, more distinct rectangles
+        # We'll be conservative - only mark as OPEN if we're very confident
+        
+        eyes_open = False
+        total_eye_area = 0
+        face_area = w * h
+        
+        if eye_count >= 2:
+            # Two or more eyes detected - calculate total area
+            for (ex, ey, ew, eh) in eyes:
+                total_eye_area += ew * eh
+            
+            # If total eye area is significant relative to face, eyes are likely open
+            # Open eyes typically take up 2-5% of face area
+            eye_area_ratio = total_eye_area / face_area if face_area > 0 else 0
+            
+            # More aggressive threshold - need at least 2.5% of face area to be considered open
+            # This makes it harder to be marked as "open" - better for detecting closed eyes
+            if eye_area_ratio > 0.025:  # At least 2.5% of face area (increased from 1.5%)
+                eyes_open = True
+            else:
+                # Small eye area - likely closed eyes (eyelids detected as small rectangles)
+                eyes_open = False
+        elif eye_count == 1:
+            # Single eye detected - be very conservative
+            # If only one eye detected, assume eyes are closed (need both eyes open)
+            eyes_open = False
+        else:
+            # No eyes detected - if face is detected, eyes are definitely closed
+            # (Open eyes should be easily detectable)
+            eyes_open = False
         
         return {
             'eyes_detected': eye_count,
             'eyes_open': eyes_open,
-            'eye_boxes': [(x+ex, y+ey, ew, eh) for (ex, ey, ew, eh) in eyes]
+            'eye_boxes': [(x+ex, y+ey, ew, eh) for (ex, ey, ew, eh) in eyes],
+            'detection_method': 'opencv',
+            'eye_area_ratio': total_eye_area / face_area if face_area > 0 else 0
         }
     
     def detect_eyes_dlib(self, frame: np.ndarray, face_bbox: Tuple) -> Dict:
@@ -270,6 +321,7 @@ class SleepDetection:
             })
         
         return results
+
 
 
 
